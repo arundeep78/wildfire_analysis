@@ -7,9 +7,10 @@
         {
             "name": "Python: Module",
             "type": "python",
+            "cwd": "${workspaceFolder}/app",
             "request": "launch",
             "module": "streamlit",
-            "args": ["run", "app/main.py"],//"${file}"],
+            "args": ["run", "main.py"],//"${file}"],
             "justMyCode": true
         }
     ]

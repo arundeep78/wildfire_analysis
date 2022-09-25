@@ -13,7 +13,7 @@ services:
         # Optional Node.js version to install
         NODE_VERSION: "none"
     env_file:
-      - .env
+      - ./.env
       
 
     volumes:
