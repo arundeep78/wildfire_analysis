@@ -64,17 +64,20 @@ TBL_COLS_COMMENTS = {
 }
 
 
-# read data from SQLite file
-df = dbu.read_sqlite_data(STMT_WF, SQLITE_FILE)
+conn = dbu.get_db_connection()
 
-df.columns = df.columns.str.lower()
-df = df.convert_dtypes()
+if not dbu.table_exists(TABLE_WF,db_conn=conn):
+    # read data from SQLite file
+    df = dbu.read_sqlite_data(STMT_WF, SQLITE_FILE)
 
-# add data into postgres DB
-start = time.perf_counter()
-dbu.init_pgdb(df,TABLE_WF, TBL_COLS,TBL_COLS_COMMENTS, fast=True)
+    df.columns = df.columns.str.lower()
+    df = df.convert_dtypes()
 
-dur = time.perf_counter() - start
+    # add data into postgres DB
+    start = time.perf_counter()
+    dbu.init_pgdb(df,TABLE_WF, TBL_COLS,TBL_COLS_COMMENTS, fast=True)
 
-print(f'time taken: {dur}')
+    dur = time.perf_counter() - start
+
+    print(f'time taken: {dur}')
 

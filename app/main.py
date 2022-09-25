@@ -39,16 +39,13 @@ def main():
     st.markdown("---")
 
     #Get overall US wildfire info    
-    wf_info = utils.get_wf_trend(conn = conn)    
+    wf_info = utils.get_us_wf_stats(conn = conn)    
     # Get county based info
     county_info = utils.get_county_stats(conn,3)
     
     # get states
-    df_states = utils.get_states(conn)
-    df_trend = wf_info['data_table']
-    area_rate = wf_info['area_coef'][0]
-    count_rate = wf_info['count_coef'][0]
-
+    list_states = utils.get_states(conn)
+  
 
    # -------Side bar information-----------#
     st.sidebar.write(f"#### Total US Wildfires between {wf_info['start_year']}-{wf_info['end_year']} : ",f'\n{wf_info["total_fire"]:,.2f}')
@@ -57,7 +54,7 @@ def main():
     st.sidebar.write(f"#### {county_info['missing_county_pct']:,.2f} % events do not have county information!")
     st.sidebar.write("---")
 
-    sel_state = st.sidebar.selectbox(label='Select state', options=df_states,format_func=utils.get_state_name)
+    sel_state = st.sidebar.selectbox(label='Select state for individual trends', options=list_states,format_func=utils.get_state_name)
 
     # get start and end year for selected state
     state_years = utils.get_state_years(conn=conn, state=sel_state)
@@ -68,11 +65,28 @@ def main():
     # get fire locations info for the map component
     df_state_locs = utils.get_state_fire_locs(conn, sel_state, sel_year)
 
+    # get state wildfire trends data
+    state_wf_info = utils.get_state_wf_trend(conn, sel_state)
+    df_trend = state_wf_info['data_table']
+    area_rate = state_wf_info['area_coef'][0]
+    count_rate = state_wf_info['count_coef'][0]
+
+    #Build headline row
+    r0c1, r0c2 = st.columns([1,1])
+    
+    with r0c1:
+        st.write(f"""### Wildfires trend for {utils.get_state_name(sel_state)}""")
+    
+    with r0c2:
+        st.write("### Wildfire information for all counties")
+        
+
     #Build 1st row   
     r1c1,r1c2, r1c3 = st.columns([2,1,1])
    
     with r1c1:
-        st.write(f'#### Number of US Wildfires {utils.slope_text(count_rate)} at annual rate of {count_rate:,.2f} ')
+                
+        st.write(f"Wildfires {utils.slope_text(count_rate)} at annual rate of {count_rate:,.2f} """)
 
         st.line_chart(df_trend['count'],)
 
@@ -95,7 +109,7 @@ def main():
     r2c1,r2c2 = st.columns([1,1])
 
     with r2c1:
-        st.write(f'#### Area burned due to wildfires {utils.slope_text(area_rate)} {area_rate:,.2f} acres annually')
+        st.write(f'Area burned {utils.slope_text(area_rate)} {area_rate:,.2f} acres annually')
         st.line_chart(df_trend['area'])
 
     with r2c2:

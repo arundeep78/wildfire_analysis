@@ -70,9 +70,7 @@ def read_sqlite_data(stmt , sqlite_file ):
 
 def init_pgdb(df, tbl_name, tbl_cols, tbl_comments, fast = True):
     
-    #get pgsql connection
-    db_conn = get_db_connection()
-
+    
     #create blank DB table with structure
     pd.DataFrame(columns=tbl_cols
                 ).to_sql(tbl_name, 

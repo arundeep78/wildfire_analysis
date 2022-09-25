@@ -18,22 +18,38 @@ ARG USER_ID=1001
 ENV USER_ID $USER_ID
 ARG GROUP_ID=1001
 ENV GROUP_ID $GROUP_ID
+ARG USER_NAME=appuser
+
+
+ARG APP_DIR=/usr/src/app
+# Setup app directory and copy files
+RUN mkdir -p $APP_DIR
+
+# Copy app files to container
+WORKDIR $APP_DIR
+COPY ./app .
+COPY ./download_data.sh .
+
+# Download data file for US wildfire analysis
+ARG HOME=/home/$USER_NAME
+RUN mkdir -p $HOME/.kaggle 
+COPY ./kaggle.json $HOME/.kaggle
+RUN chmod 600 $HOME/.kaggle/kaggle.json 
+RUN ./download_data.sh
 
 # # add non-root user and give permissions to workdir
-RUN groupadd --gid $GROUP_ID appuser && \
-          adduser appuser --ingroup appuser --gecos '' --disabled-password --uid $USER_ID && \
-          mkdir -p /usr/src/app && \
-          chown -R appuser:appuser /usr/src/app
+
+RUN groupadd --gid $GROUP_ID $USER_NAME && \
+          adduser $USER_NAME --ingroup $USER_NAME --gecos '' --disabled-password --uid $USER_ID && \
+          chown -R $USER_NAME:$USER_NAME $APP_DIR && \
+          chown -R $USER_NAME:$USER_NAME $HOME
+
 
 
 # #switch user
-USER appuser
-
-# Copy app files to container
-WORKDIR /usr/src/app
-COPY ./app .
+USER $USER_NAME
 
 # To download nltk lexicons upfront before starting streamlit app
 # RUN python ./__init__.py
 
-CMD streamlit run --server.port 80 main.py
+# CMD streamlit run --server.port 80 main.py

@@ -16,7 +16,7 @@ services:
       - ./.env
 
     # Overrides default command so things don't shut down after the process ends.
-    command: python ./__init__.py && streamlit run --server.port 80 main.py
+    command: streamlit run --server.port 80 main.py && python ./__init__.py
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db

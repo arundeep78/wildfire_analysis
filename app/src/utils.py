@@ -26,7 +26,7 @@ def get_state_name(state_code:str):
         state_code (str): State code
     """
 
-    return us.states.lookup(state_code).name
+    return 'All US States' if state_code.lower() == 'all' else us.states.lookup(state_code).name
 
 def get_states(conn:engine):
     """
@@ -41,8 +41,8 @@ def get_states(conn:engine):
 
     stmt = f'select distinct(state) from {TABLE_WF}'
 
-    df_states = pd.read_sql(stmt,con=conn)
-    return df_states
+    list_states = ['all'] + pd.read_sql(stmt,con=conn).squeeze().to_list()
+    return list_states
 
 def get_state_years(conn:engine, state:str):
     """
@@ -55,7 +55,10 @@ def get_state_years(conn:engine, state:str):
     Return:
         list containg start year and end year for fires for given state
     """
-    stmt = f"select min(fire_year) as s_year, max(fire_year) as e_year from {TABLE_WF} where state='{state}'"
+    if state.lower() == 'all':
+        stmt = f"select min(fire_year) as s_year, max(fire_year) as e_year from {TABLE_WF}"
+    else:
+        stmt = f"select min(fire_year) as s_year, max(fire_year) as e_year from {TABLE_WF} where state='{state}'"
 
     df= pd.read_sql(stmt, con=conn).squeeze()
 
@@ -77,16 +80,17 @@ def get_state_fire_locs(conn:engine, state_name: str, year:int):
 
     stmt = f"""select latitude as lat, longitude as lon from {TABLE_WF} 
                     where 
-                    state='{state_name}' and
                     fire_year='{year}'
                     """
 
+    if state_name.lower() != 'all':
+        stmt = f"{stmt} and state='{state_name}' "
+         
     df_loc = pd.read_sql(stmt,con=conn)
 
     return df_loc
 
-
-def get_wf_trend(conn:engine ):
+def get_us_wf_stats(conn:engine ):
     '''
     get overall wildfire count and area trend by frequency
     
@@ -97,6 +101,46 @@ def get_wf_trend(conn:engine ):
     '''
 
     stmt = f'select fire_year as year, count(fire_year) as count, sum(fire_size) as area from {TABLE_WF} group by fire_year'
+    
+    df = pd.read_sql(stmt, conn)
+    df = df.set_index('year')
+
+    tot_fire = df['count'].sum()
+    tot_area = df['area'].sum()
+    s_year = df.index.min()
+    e_year = df.index.max()
+
+
+    count_coef = np.polyfit(df.index, df['count'], deg=1)
+    area_coef = np.polyfit(df.index, df['area'], deg=1)
+
+    return {
+            'start_year': s_year, 
+            'end_year': e_year, 
+            'total_fire': tot_fire, 
+            'total_area': tot_area, 
+            'count_coef': count_coef,
+            'area_coef': area_coef
+    }
+
+
+def get_state_wf_trend(conn:engine, state_code:str = 'all' ):
+    '''
+    get overall wildfire count and area trend by frequency
+    
+    Inputs:
+        conn: SqlAlchemy engine
+        state_code: state for which wildfire trends to be fetched
+    Output:
+        Dict: Dictionary with stats
+    '''
+    if state_code == 'all':
+        stmt = f'select fire_year as year, count(fire_year) as count, sum(fire_size) as area from {TABLE_WF} group by fire_year'
+    else:
+        stmt = f"""select fire_year as year, count(fire_year) as count, sum(fire_size) as area 
+                    from {TABLE_WF} 
+                    where state = '{state_code}'
+                    group by fire_year"""
 
     df = pd.read_sql(stmt, conn)
     df = df.set_index('year')
