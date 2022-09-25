@@ -68,7 +68,7 @@ def read_sqlite_data(stmt , sqlite_file ):
     df = pd.read_sql(stmt, sqlite_conn)
     return df
 
-def init_pgdb(df, tbl_name, tbl_cols, tbl_comments, fast = True):
+def init_pgdb( db_conn,df, tbl_name, tbl_cols, tbl_comments, fast = True,):
     
     
     #create blank DB table with structure

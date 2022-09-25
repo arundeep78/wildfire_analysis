@@ -41,8 +41,9 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [5432, 5000,8501,8888],
 
+	"updateContentCommand": "./app/download_data.sh",
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": ["./app/download_data.sh","python ./app/__init__.py"],
+	"postCreateCommand": "python ./app/__init__.py",
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"

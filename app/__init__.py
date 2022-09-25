@@ -75,7 +75,7 @@ if not dbu.table_exists(TABLE_WF,db_conn=conn):
 
     # add data into postgres DB
     start = time.perf_counter()
-    dbu.init_pgdb(df,TABLE_WF, TBL_COLS,TBL_COLS_COMMENTS, fast=True)
+    dbu.init_pgdb(conn, df,TABLE_WF, TBL_COLS,TBL_COLS_COMMENTS, fast=True)
 
     dur = time.perf_counter() - start
 
