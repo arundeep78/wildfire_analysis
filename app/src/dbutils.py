@@ -5,7 +5,7 @@ import pandas as pd
 import io
 
 
-def table_exists( tbl_name , db_conn = None):
+def table_exists( tbl_name:str , db_conn = None):
     """
     Returns true or false if table exists in DB
     
@@ -18,7 +18,7 @@ def table_exists( tbl_name , db_conn = None):
 
     return sa.inspect(db_conn).has_table(tbl_name)
 
-def get_table_columns(tbl_name, db_conn):
+def get_table_columns(tbl_name:str, db_conn):
     """
     Returns column names of the given table
     
@@ -32,7 +32,7 @@ def get_table_columns(tbl_name, db_conn):
     cols = [ col[0] for col in res.fetchall()]
     return cols
 
-def create_table_comments(tbl_name, db_conn, tbl_comments):
+def create_table_comments(tbl_name:str, db_conn, tbl_comments):
     """
     Creates table comments in the database for a given table. 
     
@@ -69,8 +69,19 @@ def read_sqlite_data(stmt , sqlite_file ):
     return df
 
 def init_pgdb( db_conn,df, tbl_name, tbl_cols, tbl_comments, fast = True,):
+    """
+    helper function that read that add Db to PostgresQL DB with table comments
+
+    Inputs: 
+        db_conn (SQLAlchemy engine) : SQLalchemy engine connection to DB
+        tbl_name (str) : Table name od DB to which store DF
+        tbl_cols (dict): Dictionary with table column names and its dtype in postgreswl dialect
+        tbl_comments (dict): Dictionary with table description and table column descriptions
+        fast (Boolean): flag to use faster method( not quite forgiving) or slow method (handles lot of datatype level conversions)
     
-    
+    returns:
+        None
+    """
     #create blank DB table with structure
     pd.DataFrame(columns=tbl_cols
                 ).to_sql(tbl_name, 

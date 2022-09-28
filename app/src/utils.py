@@ -216,11 +216,3 @@ def load_css():
         css_text = f.read()
         st.markdown('<style>{}</style>'.format(css_text), unsafe_allow_html=True)
 
-# def init_connection():
-
-#     # return psycopg2.connect(**st.secrets["postgres"])
-
-#     return sa.create_engine(f"postgresql://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@{os.environ['POSTGRES_HOST']}/{os.environ['POSTGRES_DB']}")
-
-# # Initialize Db connection
-# conn = init_connection()

@@ -74,13 +74,13 @@ If you use VS code for development, then you can execute and change the applicat
 
 Jupyter notebook depends on certain python libraries. All Requirements libraries/packages are listed in `requirements.txt` file.
 
-### If using VS Code development containers
+### With VS Code development containers
 
 Repo contains [VS code development configuration](https://code.visualstudio.com/docs/remote/containers-tutorial), which allows to open the repo in a container to execute Jupyter notebook in an environment with all dependencies already setup.
 
 At the time of container build [dataset file from kaggle](https://www.kaggle.com/datasets/rtatman/188-million-us-wildfires) will be downloaded and stored  in `app/db/wildfires_us.sqlite`. This file is not uploaded to repo due to size limits.
 
-### If you are using different python environment
+### With different python environment
 
 1. Please install all required packages using requirements.txt file.
 2. Configure `'SQLITE_DB_FILE` in your os environment to locations of the sqlite file. SQLlite file can be downloaded from [kaggle datasets](https://www.kaggle.com/datasets/rtatman/188-million-us-wildfires). Default path is configured in `wf_classifier.ipynb`. Alternatively, you can also set the path directly in the notebook file.
